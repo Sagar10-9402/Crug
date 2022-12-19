@@ -1,0 +1,344 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyP4m5xMWlt//+ExfeljVlqb",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Sagar10-9402/Crug/blob/main/annotationner%20model%20train\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install spacy"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "2hK0eKhYm-vi",
+        "outputId": "7f812d83-722b-4925-fd26-8a9c98067223"
+      },
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/\n",
+            "Requirement already satisfied: spacy in /usr/local/lib/python3.8/dist-packages (3.4.4)\n",
+            "Requirement already satisfied: preshed<3.1.0,>=3.0.2 in /usr/local/lib/python3.8/dist-packages (from spacy) (3.0.8)\n",
+            "Requirement already satisfied: wasabi<1.1.0,>=0.9.1 in /usr/local/lib/python3.8/dist-packages (from spacy) (0.10.1)\n",
+            "Requirement already satisfied: tqdm<5.0.0,>=4.38.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (4.64.1)\n",
+            "Requirement already satisfied: spacy-legacy<3.1.0,>=3.0.10 in /usr/local/lib/python3.8/dist-packages (from spacy) (3.0.10)\n",
+            "Requirement already satisfied: cymem<2.1.0,>=2.0.2 in /usr/local/lib/python3.8/dist-packages (from spacy) (2.0.7)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.8/dist-packages (from spacy) (57.4.0)\n",
+            "Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (21.3)\n",
+            "Requirement already satisfied: srsly<3.0.0,>=2.4.3 in /usr/local/lib/python3.8/dist-packages (from spacy) (2.4.5)\n",
+            "Requirement already satisfied: catalogue<2.1.0,>=2.0.6 in /usr/local/lib/python3.8/dist-packages (from spacy) (2.0.8)\n",
+            "Requirement already satisfied: spacy-loggers<2.0.0,>=1.0.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (1.0.4)\n",
+            "Requirement already satisfied: pathy>=0.3.5 in /usr/local/lib/python3.8/dist-packages (from spacy) (0.10.1)\n",
+            "Requirement already satisfied: jinja2 in /usr/local/lib/python3.8/dist-packages (from spacy) (2.11.3)\n",
+            "Requirement already satisfied: numpy>=1.15.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (1.21.6)\n",
+            "Requirement already satisfied: typer<0.8.0,>=0.3.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (0.7.0)\n",
+            "Requirement already satisfied: langcodes<4.0.0,>=3.2.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (3.3.0)\n",
+            "Requirement already satisfied: pydantic!=1.8,!=1.8.1,<1.11.0,>=1.7.4 in /usr/local/lib/python3.8/dist-packages (from spacy) (1.10.2)\n",
+            "Requirement already satisfied: murmurhash<1.1.0,>=0.28.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (1.0.9)\n",
+            "Requirement already satisfied: thinc<8.2.0,>=8.1.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (8.1.5)\n",
+            "Requirement already satisfied: requests<3.0.0,>=2.13.0 in /usr/local/lib/python3.8/dist-packages (from spacy) (2.23.0)\n",
+            "Requirement already satisfied: smart-open<7.0.0,>=5.2.1 in /usr/local/lib/python3.8/dist-packages (from spacy) (6.3.0)\n",
+            "Requirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /usr/local/lib/python3.8/dist-packages (from packaging>=20.0->spacy) (3.0.9)\n",
+            "Requirement already satisfied: typing-extensions>=4.1.0 in /usr/local/lib/python3.8/dist-packages (from pydantic!=1.8,!=1.8.1,<1.11.0,>=1.7.4->spacy) (4.4.0)\n",
+            "Requirement already satisfied: chardet<4,>=3.0.2 in /usr/local/lib/python3.8/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (3.0.4)\n",
+            "Requirement already satisfied: idna<3,>=2.5 in /usr/local/lib/python3.8/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (2.10)\n",
+            "Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 in /usr/local/lib/python3.8/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (1.24.3)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.8/dist-packages (from requests<3.0.0,>=2.13.0->spacy) (2022.12.7)\n",
+            "Requirement already satisfied: confection<1.0.0,>=0.0.1 in /usr/local/lib/python3.8/dist-packages (from thinc<8.2.0,>=8.1.0->spacy) (0.0.3)\n",
+            "Requirement already satisfied: blis<0.8.0,>=0.7.8 in /usr/local/lib/python3.8/dist-packages (from thinc<8.2.0,>=8.1.0->spacy) (0.7.9)\n",
+            "Requirement already satisfied: click<9.0.0,>=7.1.1 in /usr/local/lib/python3.8/dist-packages (from typer<0.8.0,>=0.3.0->spacy) (7.1.2)\n",
+            "Requirement already satisfied: MarkupSafe>=0.23 in /usr/local/lib/python3.8/dist-packages (from jinja2->spacy) (2.0.1)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "kJKCs1I2h01T",
+        "outputId": "20c921c4-172e-4396-84a7-2ebe5fa40d30"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "/usr/local/lib/python3.8/dist-packages/torch/cuda/__init__.py:497: UserWarning: Can't initialize NVML\n",
+            "  warnings.warn(\"Can't initialize NVML\")\n"
+          ]
+        }
+      ],
+      "source": [
+        "\n",
+        "import os \n",
+        "import json\n",
+        "import pandas as pd \n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "import spacy \n",
+        "from spacy.tokens import DocBin\n",
+        "from tqdm import tqdm\n",
+        "import re\n",
+        "# from tika import parser\n",
+        "import warnings\n",
+        "from spacy.scorer import Scorer\n",
+        "from spacy.tokens import Doc\n",
+        "from spacy.training.example import Example\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "input_data = 'input'\n",
+        "list_tagged_files = os.listdir(input_data)\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "9l4PQ_odh3XO"
+      },
+      "execution_count": 2,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def make_v3_dataset(data, db = []):\n",
+        "    nlp = spacy.blank('en')\n",
+        "    failed_record = []\n",
+        "    if not db:\n",
+        "        db = DocBin()\n",
+        "    for text, annot in tqdm(data):\n",
+        "        doc = nlp.make_doc(text)\n",
+        "        ents = []\n",
+        "        for start, end, label in annot['entities']:\n",
+        "            span = doc.char_span(start, end, label = label, alignment_mode = 'contract')\n",
+        "            if span is None:\n",
+        "                print(f'empty entity, {text}, {annot[\"entities\"]}') #I expect this to never happen\n",
+        "            else:\n",
+        "                ents.append(span)\n",
+        "        try:\n",
+        "            doc.ents = ents\n",
+        "        except:\n",
+        "            failed_record.append((text, annot))\n",
+        "        db.add(doc)\n",
+        "    return db, failed_record\n"
+      ],
+      "metadata": {
+        "id": "J6gOUsAYh7Ni"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "for i in tqdm(range(len(list_tagged_files))):    \n",
+        "    file_path = os.path.join(input_data,list_tagged_files[i])\n",
+        "    # print(file_path)\n",
+        "    with open(file_path,'r',encoding='utf-8') as f:\n",
+        "        data = json.load(f)\n",
+        "    saving_path = os.path.join('output',list_tagged_files[i][:-5]+'.spacy')\n",
+        "    a,b = make_v3_dataset(data['annotations'])\n",
+        "    a.to_disk(saving_path)\n",
+        "    \n",
+        "    "
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "r8Kq9EOah9tY",
+        "outputId": "a42728ad-1a16-4009-aedb-fe2fd2572902"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "  0%|          | 0/2 [00:00<?, ?it/s]\n",
+            "  0%|          | 0/296 [00:00<?, ?it/s]\u001b[A\n",
+            "100%|██████████| 296/296 [00:00<00:00, 1684.18it/s]\n",
+            " 50%|█████     | 1/2 [00:00<00:00,  1.33it/s]\n",
+            "100%|██████████| 208/208 [00:00<00:00, 2303.22it/s]\n",
+            "100%|██████████| 2/2 [00:01<00:00,  1.94it/s]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python -m spacy init fill-config baseconfig.cfg config.cfg"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "AxYPTffriB3u",
+        "outputId": "21c8695d-b62d-472c-dd11-fd46aa84184b"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/usr/local/lib/python3.8/dist-packages/torch/cuda/__init__.py:497: UserWarning: Can't initialize NVML\n",
+            "  warnings.warn(\"Can't initialize NVML\")\n",
+            "2022-12-19 08:41:14.617537: E tensorflow/stream_executor/cuda/cuda_driver.cc:271] failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected\n",
+            "\u001b[38;5;2m✔ Auto-filled config with all values\u001b[0m\n",
+            "\u001b[38;5;2m✔ Saved config\u001b[0m\n",
+            "config.cfg\n",
+            "You can now add your data and train your pipeline:\n",
+            "python -m spacy train config.cfg --paths.train ./train.spacy --paths.dev ./dev.spacy\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python -m spacy train config.cfg  --output generated_model/ --paths.train output --paths.dev cross_val/ "
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "fRB75-FFiIoO",
+        "outputId": "fc07fa51-3795-4a20-f11e-e00d0d576e24"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/usr/local/lib/python3.8/dist-packages/torch/cuda/__init__.py:497: UserWarning: Can't initialize NVML\n",
+            "  warnings.warn(\"Can't initialize NVML\")\n",
+            "2022-12-19 08:41:27.322278: E tensorflow/stream_executor/cuda/cuda_driver.cc:271] failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected\n",
+            "\u001b[38;5;2m✔ Created output directory: generated_model\u001b[0m\n",
+            "\u001b[38;5;4mℹ Saving to output directory: generated_model\u001b[0m\n",
+            "\u001b[38;5;4mℹ Using CPU\u001b[0m\n",
+            "\u001b[1m\n",
+            "=========================== Initializing pipeline ===========================\u001b[0m\n",
+            "[2022-12-19 08:41:28,288] [INFO] Set up nlp object from config\n",
+            "INFO:spacy:Set up nlp object from config\n",
+            "[2022-12-19 08:41:28,301] [INFO] Pipeline: ['tok2vec', 'ner']\n",
+            "INFO:spacy:Pipeline: ['tok2vec', 'ner']\n",
+            "[2022-12-19 08:41:28,305] [INFO] Created vocabulary\n",
+            "INFO:spacy:Created vocabulary\n",
+            "[2022-12-19 08:41:28,306] [INFO] Finished initializing nlp object\n",
+            "INFO:spacy:Finished initializing nlp object\n",
+            "[2022-12-19 08:41:28,816] [INFO] Initialized pipeline components: ['tok2vec', 'ner']\n",
+            "INFO:spacy:Initialized pipeline components: ['tok2vec', 'ner']\n",
+            "\u001b[38;5;2m✔ Initialized pipeline\u001b[0m\n",
+            "\u001b[1m\n",
+            "============================= Training pipeline =============================\u001b[0m\n",
+            "\u001b[38;5;4mℹ Pipeline: ['tok2vec', 'ner']\u001b[0m\n",
+            "\u001b[38;5;4mℹ Initial learn rate: 0.001\u001b[0m\n",
+            "E    #       LOSS TOK2VEC  LOSS NER  ENTS_F  ENTS_P  ENTS_R  SCORE \n",
+            "---  ------  ------------  --------  ------  ------  ------  ------\n",
+            "/usr/local/lib/python3.8/dist-packages/spacy/training/corpus.py:80: UserWarning: [W090] Could not locate any .spacy files in path 'cross_val'.\n",
+            "  warnings.warn(Warnings.W090.format(path=orig_path, format=file_type))\n",
+            "  0       0          0.00     58.73    0.00    0.00    0.00    0.00\n",
+            "  2     200        241.56   5878.64    0.00    0.00    0.00    0.00\n",
+            "  5     400        515.21   3245.56    0.00    0.00    0.00    0.00\n",
+            "  8     600        436.48   1513.21    0.00    0.00    0.00    0.00\n",
+            " 12     800        421.92   1016.93    0.00    0.00    0.00    0.00\n",
+            " 17    1000        357.33    626.35    0.00    0.00    0.00    0.00\n",
+            " 24    1200        417.14    576.21    0.00    0.00    0.00    0.00\n",
+            " 32    1400        472.02    451.44    0.00    0.00    0.00    0.00\n",
+            " 42    1600        464.01    372.10    0.00    0.00    0.00    0.00\n",
+            "\u001b[38;5;2m✔ Saved pipeline to output directory\u001b[0m\n",
+            "generated_model/model-last\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data = ''' phacil , alexandria, va may 2012 to present sr. hyperion hfm developer · create applications in hfm, essbase and planning to delivered balance sheet, income statement, cash flow, budget and forecasting report to the clients. · manages product installations, configurations, and administrations of hyperion financial enterprise product. · reports converted to hfm, planning and essbase from oracle financial analyser.designed reports through hyperion financial reporting studio. create users & group level security through foundation service. creating data forms, grids, developed business rules load data etc. regularly update metadata with new accounts, entities and custom dimensions. creation of an application profile and application, create hierarchies. created member lists for usage in data forms and other data load activities. · multiple data sources like oracle, db2, teradata and access were being used to pull these reports through hyperion epm 11/ planning / webanalysis/essbase 11/interactive reporting /, olap, dashboard etc. sovereign /santander may 2011 to april 2012 hyperion developer bank boston, ma · woking on knowledge share and informent to create hyperion/brio reports, creating dashboard, publishing, reloadind, scheduling reports on the server. pulled information from warehouse and presented for forecasting and analysing the data.creation of cubes in essbase and planning,hfm, hyperion enterprise. other tools smart view add on , essbase add in, web analysis and wowkspace etc. · create users & group level security through power share & security. import,export files through power share · created various server side objects like tables, views, indexes, stored procedures, functions, and packages. · multiple datasource like oracle,db2,teradata and access were being used to pulled these reports through hyperion interactive reporting 11, hyperion/brio 9, \n",
+        "8, crystal report ,workspace,portal, olap, applications involved hyperion /brio 9.3 & 11 tools for the developing, testing, and scheduling financial reporting amresorts, july 2010 to apr 2011 lead hyperion developer ,philadelphia, pa · communicating status and plans to client, offshore and offsite. producing status reports and seeing that all stakeholders are aware of progress. addressing and resolving issues that offshore or users/cl09 sr. software engineer , owego ny · designed, developed and implemented a database application'''"
+      ],
+      "metadata": {
+        "id": "y98clQKgnJDr"
+      },
+      "execution_count": 13,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "nlp= spacy.load('/content/generated_model/model-best')\n",
+        "f= nlp(data)\n",
+        "for ent in f.ents:\n",
+        "    print (ent.text,ent.label_,ent.start_char,ent.end_char)\n",
+        "    # print('donr')\n",
+        "        "
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Ix2A6es3mZRW",
+        "outputId": "6861d015-3426-4f52-e9e2-a015f4cc41b0"
+      },
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "may 2012 STARTDATE 25 33\n",
+            "present ENDDATE 37 44\n",
+            "sr. hyperion hfm developer DESIGNATION 45 71\n",
+            "the clients EMPLOYER 213 224\n",
+            "data etc. regularly DESIGNATION 601 620\n",
+            "may 2011 STARTDATE 1063 1071\n",
+            "april 2012 ENDDATE 1075 1085\n",
+            "hyperion developer bank DESIGNATION 1086 1109\n",
+            "july 2010 STARTDATE 2058 2067\n",
+            "apr 2011 ENDDATE 2071 2079\n",
+            "lead hyperion developer DESIGNATION 2080 2103\n",
+            "software engineer DESIGNATION 2333 2350\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
